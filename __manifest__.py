@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Whatsapp Bot Responder",
-    'version': '18.0.1.1.1',
-    'category': 'Accounting',
+    'version': '1.0',
+    'category': '',
     'summary': """ Automatiza respuestas en WhatsApp mediante un bot sencillo """,
     'description': """ Este módulo permite automatizar respuestas en WhatsApp mediante un bot sencillo que responde a mensajes recibidos desde Odoo. """,
     'author': 'GonzaOdoo',
