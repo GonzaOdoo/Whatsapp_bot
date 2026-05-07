@@ -249,7 +249,7 @@ class WhatsappAccount(models.Model):
         if not self.calle_declarada:
             raise UserError(_("Debe ingresar una dirección primero."))
 
-        api_key = "AIzaSyCYYjkmBOaccCPi2iCGNsoBoD2ET2GfP6c"
+        api_key = "fake"
 
         url = f"https://addressvalidation.googleapis.com/v1:validateAddress?key={api_key}"
 
