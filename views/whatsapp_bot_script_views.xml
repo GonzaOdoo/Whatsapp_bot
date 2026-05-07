@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista Tree/List para WhatsApp Bot Scripts -->
+    <record id="view_whatsapp_bot_script_tree" model="ir.ui.view">
+        <field name="name">whatsapp.bot.script.tree</field>
+        <field name="model">whatsapp.bot.script</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Bot Scripts" create="true" delete="true" edit="true">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="trigger_keywords"/>
+                <field name="timeout_hours" string="Timeout (h)"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Form para WhatsApp Bot Scripts -->
+    <record id="view_whatsapp_bot_script_form" model="ir.ui.view">
+        <field name="name">whatsapp.bot.script.form</field>
+        <field name="model">whatsapp.bot.script</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Bot Script">
+                <header>
+                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <field name="active" widget="boolean_button" 
+                               options='{"terminology": "active"}'/>
+                    </button>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Nombre del script..."/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                           
+                            <field name="trigger_keywords" 
+                                   placeholder="soporte, ayuda, pedido (vacío = script por defecto)"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="steps" string="Pasos del Flujo">
+                            <field name="step_ids">
+                                <list editable="bottom" create="true" delete="true">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="step_type"/>
+                                    <field name="trigger_condition_type"/>
+                                    <field name="trigger_condition_value"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="config" string="Configuración">
+                            <group>
+                                <group>
+                                    <field name="reminder_timeout_seconds"/>
+                                    <field name="close_timeout_seconds"/>
+                                    <field name="map_token"/>
+                                </group>
+                                <group>
+                                    <field name="reminder_message"/>
+                                    <field name="close_message"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="info" string="Información">
+                            <group>
+                                <group>
+                                    <field name="id" readonly="1"/>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="write_uid" readonly="1"/>
+                                    <field name="write_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Tree/List para Pasos -->
+    <record id="view_whatsapp_bot_script_step_tree" model="ir.ui.view">
+        <field name="name">whatsapp.bot.script.step.tree</field>
+        <field name="model">whatsapp.bot.script.step</field>
+        <field name="arch" type="xml">
+            <list string="Pasos del Script" create="true" delete="true" edit="true">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="step_type"/>
+                <field name="script_id"/>
+                <field name="trigger_condition_type"/>
+                <field name="trigger_condition_value"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Form para Pasos (SIMPLIFICADA SIN ATTRS) -->
+    <record id="view_whatsapp_bot_script_step_form" model="ir.ui.view">
+        <field name="name">whatsapp.bot.script.step.form</field>
+        <field name="model">whatsapp.bot.script.step</field>
+        <field name="arch" type="xml">
+            <form string="Paso del Bot">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h2>
+                            <field name="name" placeholder="Nombre del paso..."/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="script_id"/>
+                            <field name="sequence"/>
+                            <field name="step_type"/>
+                            <field name="target_step_id" invisible="step_type != 'jump'" required="step_type == 'jump'"/>
+                            <field name="next_action"/>
+                        </group>
+                        <group>
+                            <field name="trigger_memory_key" placeholder="pedido_id, opcion, etc."/>
+                            <field name="memory_value" placeholder="Dato especifico,etc"/>
+                            <field name="trigger_case_sensitive"/>
+                            <field name="action_type"/>
+                            <field name="description"/>
+                        </group>
+                    </group>
+
+                    <!-- Contenido del Mensaje -->
+                    <field name="message" 
+                           placeholder="¡Hola %{partner.name}! ¿En qué puedo ayudarte?&#10;&#10;1️⃣ Opción 1&#10;2️⃣ Opción 2"
+                           nolabel="1" widget="text"/>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="fa fa-info-circle"/> Usa <code>%{memory.key}</code> para variables de memoria o <code>%{partner.name}</code> para datos del contacto
+                    </div>
+
+                    <!-- Condición de Activación -->
+                    <group string="Condición para Activar este Paso">
+                        <field name="trigger_condition_type"/>
+                        <field name="trigger_condition_value" 
+                               placeholder="Ej: 1,pedido (para 'contains') o ^PED-\d{5}$ (para regex)"/>
+                    </group>
+
+                    <!-- Validación de Respuesta -->
+                    <group string="Validación de Respuesta del Usuario">
+                        <field name="validation_condition_type"/>
+                        <field name="validation_condition_value" 
+                               placeholder="Ej: ^PED-\d{5}$ para validar números de pedido"/>
+                        <field name="validation_fallback_message"
+                               placeholder="❌ Formato inválido. Debe ser PED-12345. Inténtalo nuevamente."
+                               widget="text"/>
+                    </group>
+                    <group string="Documentos">
+                        <field name="document_id" domain="[('res_model', '=', 'documents.document')]"/>
+                    </group>
+
+                    <notebook>
+                        <page id="buttons" name="Botones">
+                            <field name="button_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="button_type"/>
+                                    <field name="name" required="1"/>
+                                    <field name="call_number" readonly="button_type != 'phone_number'" required="button_type == 'phone_number'" invisible="button_type != 'phone_number'"/>
+                                    <field name="website_url" readonly="button_type != 'url'" required="button_type == 'url'" invisible="button_type != 'url'" help="If the URL has no domain, your domain will be added." placeholder="e.g. https://www.example.com"/>
+                                    <field name="url_type" required="button_type == 'url'" invisible="button_type != 'url'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="placeholders" string="Placeholders y Ejemplos">
+                            <div class="alert alert-warning">
+                                <h4>Placeholders en Mensajes:</h4>
+                                <ul>
+                                    <li><code>%{partner.name}</code> - Nombre del contacto</li>
+                                    <li><code>%{partner.email}</code> - Email del contacto</li>
+                                    <li><code>%{memory.pedido_id}</code> - Variable guardada en memoria</li>
+                                    <li><code>%{memory.opcion}</code> - Cualquier clave definida en trigger_memory_key</li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-info mt16">
+                                <h4>Ejemplo de Flujo:</h4>
+                                <ol>
+                                    <li>Paso 1: <code>trigger_condition_type='none'</code> → Siempre se envía al iniciar</li>
+                                    <li>Usuario responde "2"</li>
+                                    <li>Paso 2: <code>trigger_condition_type='contains'</code>, valor="2,horario" → Se activa</li>
+                                    <li>Paso 2 tiene <code>validation_condition_type='contains'</code> con valor="Lunes,Martes..." → Valida respuesta</li>
+                                    <li>Si validación falla → se envía <code>validation_fallback_message</code> y NO se avanza</li>
+                                </ol>
+                            </div>
+
+                            <div class="alert alert-success mt16">
+                                <h4>Tipos de Condición:</h4>
+                                <table class="table">
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Ejemplo de Valor</th>
+                                        <th>Coincide con</th>
+                                    </tr>
+                                    <tr>
+                                        <td><code>none</code></td>
+                                        <td>(vacío)</td>
+                                        <td>Siempre (para paso inicial)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>contains</code></td>
+                                        <td><code>1,pedido</code></td>
+                                        <td>"quiero mi pedido" ✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>equals</code></td>
+                                        <td><code>SI</code></td>
+                                        <td>"SI" ✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>starts_with</code></td>
+                                        <td><code>PED-</code></td>
+                                        <td>"PED-12345" ✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>regex</code></td>
+                                        <td><code>^\d{3}-\d{4}$</code></td>
+                                        <td>"123-4567" ✅</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </page>
+
+                        <page name="info" string="Información Técnica">
+                            <group>
+                                <group>
+                                    <field name="id" readonly="1"/>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="write_uid" readonly="1"/>
+                                    <field name="write_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana para Scripts -->
+    <record id="action_whatsapp_bot_script" model="ir.actions.act_window">
+        <field name="name">WhatsApp Bot Scripts</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">whatsapp.bot.script</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer script de WhatsApp Bot
+            </p>
+            <p>
+                Define flujos conversacionales automáticos para responder a tus clientes.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_bot_script_step" model="ir.actions.act_window">
+        <field name="name">WhatsApp Bot Scripts Step</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">whatsapp.bot.script.step</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer script de WhatsApp Bot
+            </p>
+            <p>
+                Define flujos conversacionales automáticos para responder a tus clientes.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú en Configuración -->
+    <menuitem id="menu_whatsapp_bot_config"
+              name="WhatsApp Bot"
+              parent="whatsapp.whatsapp_menu_main"
+              sequence="50"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_whatsapp_bot_scripts"
+              name="Scripts"
+              parent="menu_whatsapp_bot_config"
+              action="action_whatsapp_bot_script"
+              sequence="10"/>
+    <menuitem id="menu_whatsapp_bot_scripts_steps"
+              name="Steps"
+              parent="menu_whatsapp_bot_config"
+              action="action_whatsapp_bot_script_step"
+              sequence="10"/>
+
+</odoo>

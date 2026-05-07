@@ -1,0 +1,52 @@
+<odoo>
+    <record id="view_helpdesk_ticket_form_inherit_whatsapp" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.whatsapp</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Insertar grupo de cliente primero -->
+            <xpath expr="//group[@class='mb-0 mt-4']/group[1]" position="before">
+                <group string="Datos del cliente">
+                    <field name="partner_id"/>
+                    <field name="partner_phone"/>
+                    <field name="email_cc"/>
+                </group>
+            </xpath>
+
+            <!-- Agregar campos a datos generales -->
+            <xpath expr="//group[@class='mb-0 mt-4']/group[1]" position="inside">
+                <field name="reclamo_id"/>
+                <field name="reclamo_subtipo_id"/>
+            </xpath>
+
+            <!-- Grupo ubicación -->
+            <xpath expr="//group[@class='mb-0 mt-4']/group[2]" position="after">
+                <group string="Datos de ubicación">
+                    <label for="calle_declarada"/>
+                    <div class="o_row">
+                        <field name="calle_declarada"/>
+                        <button name="action_validar_direccion_google"
+                                type="object"
+                                icon="fa-map-marker"
+                                class="btn-primary"
+                                string=""/>
+                    </div>
+
+                    <field name="calle_formateada"/>
+                    <field name="barrio"/>
+                    <field name="latitud" digits="[16,10]"/>
+                    <field name="longitud" digits="[16,10]"/>
+                </group>
+            </xpath>
+
+            <!-- Campos extra -->
+            <xpath expr="//notebook/page[@name='extra_info']/group" position="inside">
+                <field name="calificacion_bot_texto" string="Calificación bot"/>
+                <field name="calificacion_solucion_texto" string="Calificación solución"/>
+                <field name="canal_origen"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

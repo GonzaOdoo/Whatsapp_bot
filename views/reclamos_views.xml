@@ -1,0 +1,70 @@
+<odoo>
+    <record id="view_reclamo_tree" model="ir.ui.view">
+        <field name="name">reclamo.reclamo.tree</field>
+        <field name="model">reclamo.reclamo</field>
+        <field name="arch" type="xml">
+            <list string="Reclamos" default_order="parent_path, sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="team_id"/>
+                <field name="user_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_reclamo_form" model="ir.ui.view">
+        <field name="name">reclamo.reclamo.form</field>
+        <field name="model">reclamo.reclamo</field>
+        <field name="arch" type="xml">
+            <form string="Reclamo">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="parent_id"/>
+                            <field name="team_id"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+    
+                    <notebook>
+                        <page string="Subtipos">
+                            <field name="child_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="team_id"/>
+                                    <field name="user_id"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_reclamo_reclamo" model="ir.actions.act_window">
+        <field name="name">Reclamos</field>
+        <field name="res_model">reclamo.reclamo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+        
+    <menuitem id="menu_reclamo_config"
+              name="Reclamos"
+              parent="helpdesk.helpdesk_menu_config"
+              action="action_reclamo_reclamo"
+              sequence="10"/>
+
+    
+</odoo>

@@ -1,0 +1,53 @@
+<!-- views/geo_barrio_views.xml -->
+<odoo>
+
+    <!-- TREE -->
+    <record id="view_geo_barrio_tree" model="ir.ui.view">
+        <field name="name">geo.barrio.tree</field>
+        <field name="model">geo.barrio</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_geo_barrio_form" model="ir.ui.view">
+        <field name="name">geo.barrio.form</field>
+        <field name="model">geo.barrio</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                        <field name="color"/>
+                    </group>
+
+                    <group string="Geometría">
+                        <field name="polygon_geojson" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_geo_barrio" model="ir.actions.act_window">
+        <field name="name">Barrios</field>
+        <field name="res_model">geo.barrio</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- MENU -->
+    <menuitem id="menu_geo_barrio"
+              name="Barrios"
+              parent="helpdesk.helpdesk_menu_config"
+              action="action_geo_barrio"
+              sequence="10"/>
+
+</odoo>

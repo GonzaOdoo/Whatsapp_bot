@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =======================================================================
+         CONSULTA.TIPO - VISTAS
+         ======================================================================= -->
+
+    <record id="view_consulta_tipo_tree" model="ir.ui.view">
+        <field name="name">consulta.tipo.tree</field>
+        <field name="model">consulta.tipo</field>
+        <field name="arch" type="xml">
+            <list string="Tipos de Consulta" default_order="parent_path, sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="requires_info" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_consulta_tipo_form" model="ir.ui.view">
+        <field name="name">consulta.tipo.form</field>
+        <field name="model">consulta.tipo</field>
+        <field name="arch" type="xml">
+            <form string="Tipo de Consulta">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="parent_id"/>
+                            <field name="requires_info" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Descripción opcional..."/>
+
+                    <notebook>
+                        <page string="Subtipos">
+                            <field name="child_ids">
+                                <list editable="bottom" default_order="sequence">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="requires_info" widget="boolean_toggle"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--
+    <record id="view_consulta_tipo_search" model="ir.ui.view">
+        <field name="name">consulta.tipo.search</field>
+        <field name="model">consulta.tipo</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Tipos de Consulta">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <filter string="Activos" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactivos" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="Sin Padre" name="no_parent" domain="[('parent_id', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Tipo Padre" name="group_parent" context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    -->
+    <record id="action_consulta_tipo" model="ir.actions.act_window">
+        <field name="name">Tipos de Consulta</field>
+        <field name="res_model">consulta.tipo</field>
+        <field name="view_mode">list,form</field>
+        <!--<field name="search_view_id" ref="view_consulta_tipo_search"/>-->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay tipos de consulta configurados
+            </p>
+            <p>
+                Creá los tipos y subtipos de consulta para clasificar las consultas del bot.
+                Podés tener hasta 3 niveles jerárquicos.
+            </p>
+        </field>
+    </record>
+
+    <!-- =======================================================================
+         CONSULTA.REGISTRO - VISTAS
+         ======================================================================= -->
+
+    <record id="view_consulta_registro_tree" model="ir.ui.view">
+        <field name="name">consulta.registro.tree</field>
+        <field name="model">consulta.registro</field>
+        <field name="arch" type="xml">
+            <list string="Consultas" default_order="create_date desc">
+                <field name="create_date"/>
+                <field name="partner_id"/>
+                <field name="full_path_display" string="Tipo de Consulta"/>
+                <field name="subject"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'new'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'resolved'"
+                       decoration-muted="state == 'archived'"/>
+                <field name="tipo_ids" widget="many2many_tags" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+     <record id="action_consulta_registro" model="ir.actions.act_window">
+        <field name="name">Consultas</field>
+        <field name="res_model">consulta.registro</field>
+        <field name="view_mode">list,form</field>
+        <!--<field name="search_view_id" ref="view_consulta_registro_search"/>-->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay consultas registradas
+            </p>
+            <p>
+                Las consultas se registran automáticamente cuando el bot interactúa con los usuarios.
+                Acá podés ver el historial completo y dar seguimiento.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_consulta_registro_form" model="ir.ui.view">
+        <field name="name">consulta.registro.form</field>
+        <field name="model">consulta.registro</field>
+        <field name="arch" type="xml">
+            <form string="Registro de Consulta">
+                <header>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="new,in_progress,resolved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_consulta_registro)d" type="action" 
+                                class="oe_stat_button" icon="fa-list" context="{'search_default_partner_id': partner_id}">
+                            <field name="partner_id" widget="statinfo" string="Contacto"/>
+                        </button>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="conversation_id"/>
+                            <field name="create_date"/>
+                        </group>
+                        <group>
+                            <field name="tipo_ids" widget="many2many_tags" options="{'color_field': 'id'}"/>
+                            <field name="full_path_display" readonly="1" widget="badge"/>
+                        </group>
+                    </group>
+                    
+                    <field name="subject" placeholder="Asunto breve..."/>
+                    <field name="description" placeholder="Descripción detallada de la consulta..."/>
+                    
+                    <notebook>
+                        <page string="Notas Internas">
+                            <field name="notes" placeholder="Notas internas para seguimiento..."/>
+                        </page>
+                        <page string="Datos de Memoria">
+                            <field name="memory_data" widget="json" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--
+    <record id="view_consulta_registro_search" model="ir.ui.view">
+        <field name="name">consulta.registro.search</field>
+        <field name="model">consulta.registro</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Consultas">
+                <field name="partner_id"/>
+                <field name="subject"/>
+                <field name="description"/>
+                <field name="full_path_text"/>
+                <field name="tipo_ids"/>
+                <filter string="Nuevas" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="En Proceso" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Resueltas" name="resolved" domain="[('state', '=', 'resolved')]"/>
+                <separator/>
+                <filter string="Este Mes" name="month" domain="[('create_date', '>=', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Últimos 7 días" name="week" domain="[('create_date', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Contacto" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Tipo Nivel 1" name="group_layer1" context="{'group_by': 'layer1_code'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'create_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    -->
+   
+
+    <!-- =======================================================================
+         MENÚS
+         ======================================================================= -->
+
+    <menuitem id="menu_consulta_root"
+              name="Consultas WhatsApp"
+              parent="helpdesk.helpdesk_menu_config"
+              sequence="20"/>
+
+    <menuitem id="menu_consulta_registro"
+              name="Historial de Consultas"
+              parent="menu_consulta_root"
+              action="action_consulta_registro"
+              sequence="10"/>
+
+    <menuitem id="menu_consulta_tipo"
+              name="Tipos de Consulta"
+              parent="menu_consulta_root"
+              action="action_consulta_tipo"
+              sequence="20"/>
+
+</odoo>

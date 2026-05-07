@@ -1,0 +1,20 @@
+.ticket-desc {
+    max-width:400px;
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    line-height:1.3em;
+    max-height:2.6em;
+    transition:all 0.2s;
+}
+
+.ticket-desc:hover {
+    -webkit-line-clamp:unset;
+    max-height:none;
+    background:#fff;
+    position:absolute;
+    z-index:10;
+    padding:6px;
+    border:1px solid #ddd;
+}

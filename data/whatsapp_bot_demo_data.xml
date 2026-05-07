@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Script Principal -->
+    <record id="script_principal" model="whatsapp.bot.script">
+        <field name="name">Bot Principal - Flujo con Validación</field>
+        <field name="sequence">10</field>
+        <field name="active">True</field>
+        <field name="timeout_hours">24</field>
+    </record>
+
+    <!-- Paso 1: Bienvenida (siempre se ejecuta en nuevas conversaciones) -->
+    <record id="step_1_bienvenida" model="whatsapp.bot.script.step">
+        <field name="script_id" ref="script_principal"/>
+        <field name="sequence">10</field>
+        <field name="name">Bienvenida</field>
+        <field name="step_type">message</field>
+        <field name="trigger_condition_type">none</field>
+        <field name="message">¡Hola %{partner.name}! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?
+
+1️⃣ Consultar pedido
+2️⃣ Horarios de atención
+3️⃣ Contactar con un agente</field>
+        <field name="validation_condition_type">contains</field>
+        <field name="validation_condition_value">1,2,3,pedido,horario,agente</field>
+        <field name="validation_fallback_message">🤖 Por favor elige una opción válida:
+
+1️⃣ Consultar pedido
+2️⃣ Horarios de atención
+3️⃣ Contactar con un agente</field>
+        <field name="next_action">next</field>
+    </record>
+
+    <!-- Paso 2: Opción 1 - Pedido -->
+    <record id="step_2_pedido" model="whatsapp.bot.script.step">
+        <field name="script_id" ref="script_principal"/>
+        <field name="sequence">20</field>
+        <field name="name">Opción 1: Consultar Pedido</field>
+        <field name="step_type">message</field>
+        <field name="trigger_condition_type">contains</field>
+        <field name="trigger_condition_value">1,pedido</field>
+        <field name="trigger_memory_key">opcion</field>
+        <field name="message">📦 Por favor envía tu número de pedido (ej: PED-12345)</field>
+        <field name="validation_condition_type">regex</field>
+        <field name="validation_condition_value">^PED-\d{5}$</field>
+        <field name="validation_fallback_message">❌ Formato inválido. Debe ser PED-12345. Inténtalo nuevamente.</field>
+        <field name="next_action">next</field>
+    </record>
+
+    <!-- Paso 3: Opción 2 - Horarios -->
+    <record id="step_3_horario" model="whatsapp.bot.script.step">
+        <field name="script_id" ref="script_principal"/>
+        <field name="sequence">30</field>
+        <field name="name">Opción 2: Horarios</field>
+        <field name="step_type">message</field>
+        <field name="trigger_condition_type">contains</field>
+        <field name="trigger_condition_value">2,horario,hora</field>
+        <field name="trigger_memory_key">opcion</field>
+        <field name="message">🕒 Nuestros horarios de atención son:
+
+Lunes a Viernes: 8:00 - 18:00
+Sábado: 9:00 - 13:00
+Domingo: Cerrado</field>
+        <field name="next_action">next</field>
+    </record>
+
+    <!-- Paso 4: Opción 3 - Agente -->
+    <record id="step_4_agente" model="whatsapp.bot.script.step">
+        <field name="script_id" ref="script_principal"/>
+        <field name="sequence">40</field>
+        <field name="name">Opción 3: Contactar Agente</field>
+        <field name="step_type">message</field>
+        <field name="trigger_condition_type">contains</field>
+        <field name="trigger_condition_value">3,agente,soporte,humano</field>
+        <field name="trigger_memory_key">opcion</field>
+        <field name="message">✅ ¡Perfecto! Un agente te contactará pronto. ¡Gracias por tu paciencia!</field>
+        <field name="next_action">end</field>
+    </record>
+
+    <!-- Paso 5: Fallback genérico (se ejecuta si ninguna opción coincide después de validación) -->
+    <record id="step_5_fallback" model="whatsapp.bot.script.step">
+        <field name="script_id" ref="script_principal"/>
+        <field name="sequence">50</field>
+        <field name="name">Fallback: Opción Inválida</field>
+        <field name="step_type">message</field>
+        <field name="trigger_condition_type">none</field>
+        <field name="message">🤖 No entendí tu opción. Por favor intenta nuevamente.</field>
+        <field name="next_action">next</field>
+    </record>
+
+</odoo>

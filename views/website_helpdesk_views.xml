@@ -1,0 +1,277 @@
+<odoo>
+    <template id="portal_helpdesk_ticket_custom"
+              inherit_id="helpdesk.portal_helpdesk_ticket">
+
+        <!-- ===================== -->
+        <!-- CSS RESPONSIVE -->
+        <!-- ===================== -->
+        <xpath expr="//t[@t-foreach='tickets']/tr" position="before">
+            <style>
+                /* MOBILE */
+                @media (max-width: 767px) {
+                    table {
+                        display: none;
+                    }
+
+                    .mobile-card {
+                        display: block;
+                        background: white;
+                        border-radius: 10px;
+                        padding: 14px;
+                        margin-bottom: 12px;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                    }
+
+                    .mobile-title {
+                        font-weight: bold;
+                        font-size: 15px;
+                        margin-bottom: 6px;
+                    }
+
+                    .mobile-desc {
+                        font-size: 13px;
+                        color: #555;
+                        margin-bottom: 8px;
+                    }
+
+                    .mobile-row {
+                        font-size: 13px;
+                        margin-bottom: 4px;
+                    }
+
+                    .mobile-images img {
+                        max-height: 60px;
+                        margin-right: 4px;
+                        border-radius: 4px;
+                    }
+                }
+
+                /* DESKTOP */
+                @media (min-width: 768px) {
+                    .mobile-card {
+                        display: none;
+                    }
+                }
+
+                /* descripción desktop */
+                .ticket-desc {
+                    max-width:400px;
+                    overflow:hidden;
+                    display:-webkit-box;
+                    -webkit-line-clamp:2;
+                    -webkit-box-orient:vertical;
+                    line-height:1.3em;
+                    max-height:2.6em;
+                }
+            </style>
+        </xpath>
+
+        <!-- ===================== -->
+        <!-- HEADER -->
+        <!-- ===================== -->
+        <xpath expr="//thead/tr" position="replace">
+            <tr>
+                <th>Ticket</th>
+                <th>Calle Declarada</th>
+                <th>Descripción</th>
+                <th>Etapa</th>
+                <th>Prioridad</th>
+                <th>Imagenes</th>
+            </tr>
+        </xpath>
+
+        <!-- ===================== -->
+        <!-- FILAS DESKTOP -->
+        <!-- ===================== -->
+        <xpath expr="//t[@t-foreach='tickets']/tr" position="replace">
+            <tr>
+                <td>
+                    <a t-attf-href="/helpdesk/ticket/#{ticket.id}">
+                        <t t-out="ticket.ticket_ref"/>
+                    </a>
+                </td>
+
+                <td>
+                    <t t-esc="ticket.calle_declarada"/>
+                </td>
+
+                <td>
+                    <div class="ticket-desc">
+                        <t t-esc="ticket.description"/>
+                    </div>
+                </td>
+
+                <td>
+                    <t t-esc="ticket.stage_id.name"/>
+                </td>
+
+                <td>
+                    <t t-set="priority" t-value="int(ticket.priority or 0)"/>
+                    <t t-foreach="range(1,4)" t-as="i">
+                        <i t-att-class="'fa ' + ('fa-star' if i &lt;= priority else 'fa-star-o')"
+                           style="color:#f5c542;"/>
+                    </t>
+                </td>
+
+                <td>
+                    <t t-set="images"
+                       t-value="request.env['ir.attachment'].sudo().search([
+                            ('res_model','=','helpdesk.ticket'),
+                            ('res_id','=',ticket.id),
+                            ('mimetype','ilike','image')
+                       ])"/>
+
+                    <t t-if="images">
+                        <t t-foreach="images" t-as="img">
+                            <img style="max-height:60px; cursor:pointer;"
+                                 t-att-src="'/web/image/%s/%s/datas' % (img._name, img.id)"
+                                 data-bs-toggle="modal"
+                                 t-att-data-bs-target="'#imgModal_%s' % img.id"/>
+                        </t>
+                    </t>
+                </td>
+            </tr>
+        </xpath>
+
+        <!-- ===================== -->
+        <!-- MOBILE CARDS -->
+        <!-- ===================== -->
+        <xpath expr="//t[@t-foreach='tickets']" position="after">
+            <t t-foreach="tickets" t-as="ticket">
+
+                <t t-set="images"
+                   t-value="request.env['ir.attachment'].sudo().search([
+                        ('res_model','=','helpdesk.ticket'),
+                        ('res_id','=',ticket.id),
+                        ('mimetype','ilike','image')
+                   ])"/>
+
+                <div class="mobile-card">
+
+                    <div class="mobile-title">
+                        <a t-attf-href="/helpdesk/ticket/#{ticket.id}">
+                            #<t t-out="ticket.ticket_ref"/>
+                        </a>
+                    </div>
+
+                    <div class="mobile-row">
+                        📍 <t t-esc="ticket.calle_declarada"/>
+                    </div>
+
+                    <div class="mobile-desc">
+                        <t t-esc="ticket.description"/>
+                    </div>
+
+                    <div class="mobile-row">
+                        <strong>Estado:</strong>
+                        <t t-esc="ticket.stage_id.name"/>
+                    </div>
+
+                    <div class="mobile-row">
+                        <strong>Prioridad:</strong>
+                        <t t-set="priority" t-value="int(ticket.priority or 0)"/>
+                        <t t-foreach="range(1,4)" t-as="i">
+                            <i t-att-class="'fa ' + ('fa-star' if i &lt;= priority else 'fa-star-o')"
+                               style="color:#f5c542;"/>
+                        </t>
+                    </div>
+
+                    <div class="mobile-images">
+                        <t t-if="images">
+                            <t t-foreach="images" t-as="img">
+                                <img t-att-src="'/web/image/%s/%s/datas' % (img._name, img.id)"
+                                     data-bs-toggle="modal"
+                                     t-att-data-bs-target="'#imgModal_%s' % img.id"/>
+                            </t>
+                        </t>
+                    </div>
+
+                </div>
+            </t>
+        </xpath>
+
+        <!-- ===================== -->
+        <!-- MODALES -->
+        <!-- ===================== -->
+        <xpath expr="//t[@t-foreach='tickets']/tr" position="after">
+            <t t-foreach="tickets" t-as="ticket">
+                <t t-set="images"
+                   t-value="request.env['ir.attachment'].sudo().search([
+                        ('res_model','=','helpdesk.ticket'),
+                        ('res_id','=',ticket.id),
+                        ('mimetype','ilike','image')
+                   ])"/>
+
+                <t t-if="images">
+                    <t t-foreach="images" t-as="img">
+                        <div class="modal fade" t-att-id="'imgModal_%s' % img.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered modal-xl">
+                                <div class="modal-content bg-transparent border-0">
+                                    <div class="modal-body text-center">
+                                        <img t-att-src="'/web/image/%s/%s/datas' % (img._name, img.id)"
+                                             style="max-width:100%; max-height:80vh;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </xpath>
+
+    </template>
+
+    <template id="tickets_followup_stage_update"
+              inherit_id="helpdesk.tickets_followup">
+
+        <xpath expr="//t[@t-call='helpdesk.portal_my_tickets_badge_widget_template']"
+               position="replace">
+
+            <!-- Si es el asignado -->
+            <t t-if="ticket.user_id.id == request.env.user.id">
+                <!-- 🔒 SOLO LECTURA si está fold -->
+                <t t-if="ticket.stage_id.fold">
+                    <span class="badge bg-secondary ms-2" style="font-size:14px; padding:6px 10px;">
+                        <t t-esc="ticket.stage_id.name"/>
+                    </span>
+                </t>
+            
+                <!-- ✏️ EDITABLE si NO está fold -->
+                <t t-else="">
+                    <form t-att-action="'/my/ticket/update_stage/%s/%s' % (ticket.id, ticket.access_token)"
+                          method="post"
+                          class="d-inline-flex align-items-center gap-3 ms-2">
+            
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            
+                        <select name="stage_id"
+                                class="form-select"
+                                style="min-width:180px;"
+                                onchange="this.form.submit()">
+            
+                            <t t-foreach="ticket.team_id.stage_ids" t-as="stage">
+                                <t t-if="not stage.hide_in_stage or stage.id == ticket.stage_id.id">
+                                    <option t-att-value="stage.id"
+                                            t-att-selected="stage.id == ticket.stage_id.id">
+                                        <t t-esc="stage.name"/>
+                                    </option>
+                                </t>
+                            </t>
+            
+                        </select>
+            
+                    </form>
+                </t>
+            
+            </t>
+            
+            <!-- Si NO es el asignado -->
+            <t t-else="">
+                <t t-call="helpdesk.portal_my_tickets_badge_widget_template"/>
+            </t>
+
+        </xpath>
+
+    </template>
+    
+</odoo>

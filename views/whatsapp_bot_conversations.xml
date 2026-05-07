@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista Tree: Conversaciones -->
+    <record id="view_whatsapp_bot_conversation_tree" model="ir.ui.view">
+        <field name="name">whatsapp.bot.conversation.tree</field>
+        <field name="model">whatsapp.bot.conversation</field>
+        <field name="arch" type="xml">
+            <list string="Conversaciones Bot" create="false" delete="false">
+                <field name="partner_id"/>
+                <field name="mobile_number_formatted"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state=='closed'" 
+                       decoration-warning="state=='timeout'" 
+                       decoration-danger="state=='transferred'" 
+                       decoration-info="state=='active'"/>
+                <field name="message_count" string="Mensajes"/>
+                <field name="last_message_date"/>
+                <field name="user_comment"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Form: Conversación Detallada -->
+    <record id="view_whatsapp_bot_conversation_form" model="ir.ui.view">
+        <field name="name">whatsapp.bot.conversation.form</field>
+        <field name="model">whatsapp.bot.conversation</field>
+        <field name="arch" type="xml">
+            <form string="Conversación Bot">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Conversación con <field name="partner_id" readonly="1"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="mobile_number_formatted" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="start_date" readonly="1"/>
+                            <field name="last_message_date" readonly="1"/>
+                            <field name="user_comment"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page name="messages" string="Mensajes">
+                            <field name="message_ids">
+                                <list create="false" delete="false" default_order="create_date desc">
+                                    <field name="create_date" string="Fecha"/>
+                                    <field name="message_type" widget="badge" 
+                                           decoration-success="message_type=='outbound'" 
+                                           decoration-info="message_type=='inbound'"/>
+                                    <field name="body" string="Mensaje"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción y Menú -->
+    <record id="action_whatsapp_bot_conversation" model="ir.actions.act_window">
+        <field name="name">Conversaciones del Bot</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">whatsapp.bot.conversation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_bot_conversation"
+              name="Conversaciones Bot"
+              parent="whatsapp.whatsapp_menu_main"
+              action="action_whatsapp_bot_conversation"
+              sequence="40"
+              groups="base.group_system"/>
+
+</odoo>

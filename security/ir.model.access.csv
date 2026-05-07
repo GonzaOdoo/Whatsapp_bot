@@ -1,0 +1,18 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_whatsapp_bot_script_user,access_whatsapp_bot_script_user,model_whatsapp_bot_script,base.group_user,1,1,1,1
+access_whatsapp_bot_script_step_user,access_whatsapp_bot_script_step_user,model_whatsapp_bot_script_step,base.group_user,1,1,1,1
+access_whatsapp_bot_script_manager,access_whatsapp_bot_script_manager,model_whatsapp_bot_script,base.group_system,1,1,1,1
+access_whatsapp_bot_script_step_manager,access_whatsapp_bot_script_step_manager,model_whatsapp_bot_script_step,base.group_system,1,1,1,1
+access_whatsapp_bot_conversation_user,access_whatsapp_bot_conversation_user,model_whatsapp_bot_conversation,base.group_user,1,1,1,0
+access_whatsapp_bot_conversation_message_user,access_whatsapp_bot_conversation_message_user,model_whatsapp_bot_conversation_message,base.group_user,1,1,1,0
+access_whatsapp_bot_conversation_manager,access_whatsapp_bot_conversation_manager,model_whatsapp_bot_conversation,base.group_system,1,1,1,1
+access_whatsapp_bot_conversation_message_manager,access_whatsapp_bot_conversation_message_manager,model_whatsapp_bot_conversation_message,base.group_system,1,1,1,1
+access_reclamo_user,reclamo user,model_reclamo_reclamo,base.group_user,1,1,1,0
+access_reclamo_admin,reclamo admin,model_reclamo_reclamo,base.group_system,1,1,1,1
+access_consulta_tipo_admin,consulta.tipo.admin,model_consulta_tipo,base.group_system,1,1,1,1
+access_consulta_registro_admin,consulta.registro.admin,model_consulta_registro,base.group_system,1,1,1,1
+access_consulta_registro_bot,consulta.registro.bot,model_consulta_registro,base.group_user,1,1,1,1
+ccess_helpdesk_secretary_user,helpdesk.secretary.user,model_helpdesk_secretary,base.group_user,1,1,1,1
+access_helpdesk_secretary_manager,helpdesk.secretary.manager,model_helpdesk_secretary,helpdesk.group_helpdesk_manager,1,1,1,1
+access_geo_barrio_user,geo.barrio user,model_geo_barrio,base.group_user,1,1,1,0
+access_geo_barrio_manager,geo.barrio manager,model_geo_barrio,base.group_system,1,1,1,1
